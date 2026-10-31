@@ -79,8 +79,8 @@ export default function App() {
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex flex-col justify-center items-center text-on-surface select-none">
-        <span className="material-symbols-outlined animate-spin text-4xl text-secondary" style={{ animationDuration: '2s' }}>progress_activity</span>
-        <p className="mt-4 text-sm text-on-surface-variant font-label-md">Bootstrapping Lumen...</p>
+        <span className="material-symbols-outlined animate-spin text-4xl text-primary" style={{ animationDuration: '2s' }}>progress_activity</span>
+        <p className="mt-4 text-sm text-slate-500">Bootstrapping Lumen...</p>
       </div>
     );
   }
