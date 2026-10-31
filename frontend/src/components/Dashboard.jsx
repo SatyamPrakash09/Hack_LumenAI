@@ -305,13 +305,13 @@ export default function Dashboard({ user, onLogout }) {
       {/* Main Content Area */}
       <main className="flex-1 h-screen flex flex-col relative bg-background">
         {/* Top Minimalist Header */}
-        <header className="h-14 flex items-center justify-between px-6 border-b border-[#2f2f2f]/20 bg-zinc-950/20 backdrop-blur z-40 select-none">
+        <header className="h-14 flex items-center justify-between px-6 border-b border-slate-200/70 bg-white/80 backdrop-blur z-40 select-none">
           <div className="flex items-center gap-3">
-            <span className="font-semibold text-sm text-zinc-200">
+            <span className="font-semibold text-sm text-slate-800">
               {activeSession ? activeSession.title : 'Select a Session'}
             </span>
             {activeSession && documents.length > 0 && (
-              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-zinc-850 border border-zinc-800 text-zinc-400 text-[10px] font-medium">
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-slate-100 border border-slate-200 text-slate-500 text-[10px] font-medium">
                 <span className="material-symbols-outlined text-[10px]">folder</span>
                 {documents.length} linked file{documents.length > 1 ? 's' : ''}
               </span>
