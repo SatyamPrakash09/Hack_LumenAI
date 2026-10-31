@@ -1,0 +1,16 @@
+info:
+  name: get documents
+  type: http
+  seq: 6
+
+http:
+  method: GET
+  url: "{{base_url}}/sessions/46e4ac0b-aaaa-42a0-8f5e-ee98f87c826b/documents"
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: true

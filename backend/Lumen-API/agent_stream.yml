@@ -1,0 +1,25 @@
+info:
+  name: agent_stream
+  type: http
+  seq: 9
+
+http:
+  method: POST
+  url: "{{base_url}}/sessions/46e4ac0b-aaaa-42a0-8f5e-ee98f87c826b/agent/stream"
+  body:
+    type: json
+    data: "{\r
+
+      \    \"query\":\"what is ai\"\r
+
+      \    \r
+
+      }"
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: true

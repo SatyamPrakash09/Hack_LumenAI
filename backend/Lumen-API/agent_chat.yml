@@ -1,0 +1,23 @@
+info:
+  name: agent_chat
+  type: http
+  seq: 12
+
+http:
+  method: POST
+  url: "{{base_url}}/sessions/46e4ac0b-aaaa-42a0-8f5e-ee98f87c826b/agent"
+  body:
+    type: json
+    data: |-
+      {
+          "query":"what is ai"
+          
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: true
