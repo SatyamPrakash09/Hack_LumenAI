@@ -1,48 +1,49 @@
 @import "tailwindcss";
 
 @theme {
-  /* ChatGPT-inspired deep dark theme */
-  --color-background: #0d0d0d;
-  --color-surface: #171717;
-  --color-surface-dim: #09090b;
-  --color-surface-bright: #2f2f2f;
-  --color-surface-container-lowest: #030303;
-  --color-surface-container-low: #0f0f0f;
-  --color-surface-container: #171717;
-  --color-surface-container-high: #212121;
-  --color-surface-container-highest: #2f2f2f;
+  /* Professional Light Theme — Warm Gray + Indigo */
+  --color-background: #f8f9fb;
+  --color-surface: #ffffff;
+  --color-surface-dim: #f1f3f5;
+  --color-surface-bright: #ffffff;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #f8f9fb;
+  --color-surface-container: #f1f3f5;
+  --color-surface-container-high: #ebedf0;
+  --color-surface-container-highest: #e2e5e9;
 
-  --color-on-background: #ececec;
-  --color-on-surface: #f9f9f9;
-  --color-on-surface-variant: #b4b4b4;
+  --color-on-background: #1a1d23;
+  --color-on-surface: #1a1d23;
+  --color-on-surface-variant: #64748b;
 
-  --color-primary: #10a37f; /* ChatGPT Emerald */
-  --color-primary-container: #212121;
+  --color-primary: #4f46e5;          /* Indigo 600 */
+  --color-primary-container: #eef2ff; /* Indigo 50 */
   --color-on-primary: #ffffff;
-  --color-on-primary-container: #ececec;
+  --color-on-primary-container: #312e81;
 
-  --color-secondary: #10a37f;
-  --color-secondary-container: #2f2f2f;
+  --color-secondary: #4f46e5;
+  --color-secondary-container: #e0e7ff;
   --color-on-secondary: #ffffff;
 
-  --color-outline: #2f2f2f;
-  --color-outline-variant: #212121;
+  --color-outline: #e2e5e9;
+  --color-outline-variant: #cbd5e1;
 
-  --color-error: #ef4444;
+  --color-error: #dc2626;
 
   --width-sidebar-width: 260px;
   --padding-margin-desktop: 24px;
 }
 
-@keyframes pulse-emerald {
+@keyframes pulse-accent {
   0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.5; transform: scale(1.1); }
+  50% { opacity: 0.6; transform: scale(1.08); }
 }
 
 .animate-pulse-emerald {
-  animation: pulse-emerald 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  animation: pulse-accent 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
+/* Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -53,23 +54,24 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #2f2f2f;
+  background: #cbd5e1;
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #383838;
+  background: #94a3b8;
 }
 
+/* Glass Panel — Sidebar */
 .glass-panel {
-  background: #171717;
-  border-right: 1px solid #2f2f2f;
+  background: #ffffff;
+  border-right: 1px solid #e2e5e9;
 }
 
-/* Base resets to fit modern aesthetic */
+/* Base resets */
 body {
-  background-color: #0d0d0d;
-  color: #ececec;
+  background-color: #f8f9fb;
+  color: #1a1d23;
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
@@ -84,6 +86,13 @@ body {
 .markdown-content a {
   overflow-wrap: break-word;
   word-break: break-all;
+  color: #4f46e5;
+  text-decoration: underline;
+  text-decoration-color: #c7d2fe;
+  text-underline-offset: 2px;
+}
+.markdown-content a:hover {
+  text-decoration-color: #4f46e5;
 }
 .markdown-content p {
   margin-bottom: 0.75rem;
@@ -93,11 +102,11 @@ body {
 }
 .markdown-content strong, .markdown-content b {
   font-weight: 600;
-  color: #ffffff;
+  color: #0f172a;
 }
 .markdown-content h1, .markdown-content h2, .markdown-content h3, .markdown-content h4 {
   font-weight: 700;
-  color: #ffffff;
+  color: #0f172a;
   margin-top: 1.25rem;
   margin-bottom: 0.5rem;
 }
@@ -117,15 +126,16 @@ body {
 }
 .markdown-content code {
   font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
-  background-color: #27272a;
-  color: #f4f4f5;
-  padding: 0.125rem 0.25rem;
+  background-color: #f1f5f9;
+  color: #334155;
+  padding: 0.125rem 0.375rem;
   border-radius: 0.25rem;
   font-size: 0.85em;
+  border: 1px solid #e2e8f0;
 }
 .markdown-content pre {
-  background-color: #050505;
-  border: 1px solid #27272a;
+  background-color: #1e293b;
+  border: 1px solid #334155;
   border-radius: 0.75rem;
   padding: 1rem;
   overflow-x: auto;
@@ -137,17 +147,21 @@ body {
   background-color: transparent;
   padding: 0;
   border-radius: 0;
+  border: none;
   font-size: 0.85rem;
-  color: #e4e4e7;
+  color: #e2e8f0;
   display: block;
 }
 .markdown-content blockquote {
-  border-left: 3px solid #10a37f;
+  border-left: 3px solid #4f46e5;
   padding-left: 0.75rem;
-  color: #a1a1aa;
+  color: #64748b;
   font-style: italic;
   margin-top: 0.75rem;
   margin-bottom: 0.75rem;
+  background: #f8fafc;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0 0.5rem 0.5rem 0;
 }
 
 /* ── Response Copy Button ────────────────────────────── */
@@ -159,21 +173,21 @@ body {
   border: none;
   border-radius: 6px;
   background: transparent;
-  color: #71717a;
+  color: #94a3b8;
   cursor: pointer;
   font-size: 12px;
   font-family: inherit;
   transition: all 0.2s ease;
 }
 .copy-btn:hover {
-  background: #27272a;
-  color: #d4d4d8;
+  background: #f1f5f9;
+  color: #475569;
 }
 .copy-btn.copied {
-  color: #10a37f;
+  color: #4f46e5;
 }
 .copy-btn.copied:hover {
-  background: rgba(16, 163, 127, 0.1);
+  background: rgba(79, 70, 229, 0.06);
 }
 .copy-btn-icon {
   font-size: 15px !important;
@@ -197,10 +211,10 @@ body {
   justify-content: center;
   width: 30px;
   height: 30px;
-  border: 1px solid #3f3f46;
+  border: 1px solid #475569;
   border-radius: 6px;
-  background: #18181b;
-  color: #a1a1aa;
+  background: #334155;
+  color: #94a3b8;
   cursor: pointer;
   opacity: 0;
   transition: all 0.2s ease;
@@ -210,13 +224,13 @@ body {
   opacity: 1;
 }
 .code-copy-btn:hover {
-  background: #27272a;
-  color: #e4e4e7;
-  border-color: #52525b;
+  background: #475569;
+  color: #e2e8f0;
+  border-color: #64748b;
 }
 .code-copy-btn.copied {
-  color: #10a37f;
-  border-color: rgba(16, 163, 127, 0.4);
-  background: rgba(16, 163, 127, 0.1);
+  color: #818cf8;
+  border-color: rgba(79, 70, 229, 0.5);
+  background: rgba(79, 70, 229, 0.15);
   opacity: 1;
 }
