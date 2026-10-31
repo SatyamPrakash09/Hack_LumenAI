@@ -1,173 +1,236 @@
 ![Lumen](frontend/public/banner.png)
 
+<div align="center">
+
+# Lumen AI — Autonomous RAG Agent & Multi-Source Knowledge Workspace
+
+[![Hackathon](https://img.shields.io/badge/Hackathon-Hacktoberfest_Hack_Day_Noida_x_NIAT--NIU-ff6b4a?style=for-the-badge&logo=hackerearth&logoColor=white)](https://www.mlh.com/events/hacktoberfest-hack-day-noida-delhi-ncr-x-niat-niu)
+[![MLH Event](https://img.shields.io/badge/MLH-Partner_Event-blue?style=for-the-badge&logo=majorleaguehacking&logoColor=white)](https://www.mlh.com/events/hacktoberfest-hack-day-noida-delhi-ncr-x-niat-niu)
+[![Hacktoberfest](https://img.shields.io/badge/Hacktoberfest-2026-orange?style=for-the-badge&logo=hacktoberfest&logoColor=white)](https://hacktoberfest.com/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)](LICENSE)
+
+**An intelligent, multi-tool RAG workspace featuring LangGraph ReAct autonomous reasoning, live web cross-verification, real-time NDJSON streaming, and a modern, professional interface.**
+
+[Event Page](https://www.mlh.com/events/hacktoberfest-hack-day-noida-delhi-ncr-x-niat-niu) • [Architecture](#-system-architecture) • [Features](#-key-features) • [Quickstart](#-quickstart-guide) • [API Reference](#-api-endpoints)
+
 ---
-# Lumen AI — Premium RAG Engine & Chat Interface
 
-Lumen AI is a premium, self-hosted Retrieval-Augmented Generation (RAG) document analysis engine and chat application. It combines a robust **FastAPI backend** running a **LangGraph ReAct agent** (with local document retrieval and live DuckDuckGo web verification) and a modern **React + Vite frontend** overhauled with a minimalist ChatGPT-like dark theme.
+</div>
+
+## 🏆 Hackathon Submission Details
+
+This project is created and submitted for **[Hacktoberfest Hack Day Noida (Delhi NCR) x NIAT-NIU](https://www.mlh.com/events/hacktoberfest-hack-day-noida-delhi-ncr-x-niat-niu)**, hosted in collaboration with **Major League Hacking (MLH)** and **Noida International University (NIAT-NIU)**.
+
+* **Track / Theme**: Open Source AI Tools, Developer Productivity, and Intelligent Retrieval
+* **Problem Addressed**: Traditional RAG systems often produce closed-world hallucinations or provide stale local answers without external fact-checking. Users rarely get visibility into the AI's decision chain.
+* **Our Solution**: **Lumen AI** breaks these limitations by pairing session-isolated document ingestion with an autonomous **LangGraph ReAct agent**. The agent dynamically determines when to retrieve local chunks, when to cross-reference claims on the live web, how to parse mathematical calculations with a secure AST sandbox, and how to query community discussions—all streamed in real-time with transparent reasoning logs and clickable inline citations.
 
 ---
 
-## Architecture & Data Flow
+## 💡 What is Lumen AI?
 
-Below is the architecture diagram showing how the frontend, FastAPI controllers, Supabase PostgreSQL metadata DB, ChromaDB vector store, LangGraph agent, Ollama model, and web tools interact:
+**Lumen AI** is an enterprise-grade, self-hosted Retrieval-Augmented Generation (RAG) assistant designed for researchers, developers, and knowledge workers. 
+
+Instead of a generic prompt-and-response box, Lumen provides a rich, multi-session research environment:
+1. **Upload Multi-Format Knowledge**: Drop in PDFs, Word docs, Markdown files, CSVs, or text notes.
+2. **Autonomous Tool Selection**: The LangGraph agent reasons through user queries, calling local ChromaDB vector search, DuckDuckGo web search, Wikipedia, or a sandboxed Python calculator.
+3. **Live Verifiable Answers**: Every answer provides real-time tool trace accordions and structured citation chips referencing exact document pages and web sources.
+4. **Professional Light Theme**: Engineered with an accessible, high-contrast, modern UI built on Tailwind CSS v4 and React.
+
+---
+
+## 🏗️ System Architecture
 
 ```mermaid
 graph TD
-    subgraph Frontend [React + Vite Client]
-        UI["Dashboard (Sidebar / Chat Canvas)"]
-        API_Client["api.js (Credentials Fetch & Interceptors)"]
-        DD_Overlay["Drag & Drop Uploader"]
+    subgraph Client ["Client Layer (React + Vite + Tailwind v4)"]
+        UI["Dashboard & Chat Canvas"]
+        API_Client["API Client (Silent Auth Refresh & NDJSON Stream)"]
+        DD_Overlay["Global Drag & Drop Ingestor"]
     end
 
-    subgraph Backend [FastAPI Server]
-        Auth_Router["Auth Routes (/api/v1/auth)"]
-        Session_Router["Session Routes (/api/v1/sessions)"]
-        Session_Ctrl["Session Controller"]
-        Pipeline["Background Ingestion Pipeline"]
-        Agent["LangGraph ReAct Agent"]
+    subgraph Backend ["Server Layer (FastAPI)"]
+        Auth_Router["Auth Controller (JWT & Cookie Rotation)"]
+        Session_Router["Session & Document Controller"]
+        Pipeline["Async Document Ingestion Pipeline"]
+        Agent["LangGraph ReAct Autonomous Agent"]
     end
 
-    subgraph Storage [Databases & External APIs]
-        DB[("Supabase PostgreSQL DB (Metadata & History)")]
-        Chroma[("ChromaDB (Vector Store)")]
-        Ollama["Ollama (Llama 3.2 Model)"]
-        Web["DuckDuckGo API (Web Verification)"]
+    subgraph Agent_Tools ["Agent Tool Ecosystem"]
+        Tool_Doc["search_documents & summarize_documents"]
+        Tool_Web["web_search (DuckDuckGo / SerpAPI)"]
+        Tool_Wiki["wikipedia_search"]
+        Tool_Calc["calculator (AST-Safe Evaluator)"]
+        Tool_HN["search_hacker_news (Algolia API)"]
+        Tool_Time["get_current_datetime"]
     end
 
-    UI -->|"Interact / Ask Questions"| API_Client
-    DD_Overlay -->|"Drag Files"| API_Client
-    
-    API_Client -->|"POST /auth/refresh"| Auth_Router
-    API_Client -->|"POST /sessions/{id}/agent/stream"| Session_Router
-    API_Client -->|"POST /sessions/{id}/documents"| Session_Router
-    
-    Session_Router --> Session_Ctrl
-    Session_Ctrl -->|"1. Pre-validate & Save Files"| Pipeline
-    Session_Ctrl -->|"Read / Write Metadata"| DB
-    
-    Pipeline -->|"2. Chunk & Embed Document"| Chroma
-    Pipeline -->|"SentenceTransformers Embed"| Ollama
-    
-    Session_Router -->|"Run Agent Query"| Agent
-    Agent -->|"1. Retrieve Local Chunks"| Chroma
-    Agent -->|"2. Cross-check Claims"| Web
-    Agent -->|"Generate synthesizing stream"| Ollama
-    Agent -->|"Stream tokens (NDJSON)"| API_Client
+    subgraph Storage ["Storage & Knowledge Layer"]
+        DB[("PostgreSQL / SQLite (Metadata & Chat History)")]
+        Chroma[("ChromaDB (Session-Isolated Vector Collections)")]
+        Embeddings["SentenceTransformers (all-MiniLM-L6-v2)"]
+        LLM["Ollama (Llama 3.2) / Google Gemini"]
+    end
+
+    UI -->|"User Prompts & File Drops"| API_Client
+    DD_Overlay -->|"Upload Files"| API_Client
+
+    API_Client -->|"Authenticate & Refresh"| Auth_Router
+    API_Client -->|"Upload Documents"| Session_Router
+    API_Client -->|"Stream Agent Execution"| Session_Router
+
+    Session_Router -->|"Store Metadata"| DB
+    Session_Router -->|"Queue Ingestion"| Pipeline
+    Pipeline -->|"Extract & Chunk"| Embeddings
+    Embeddings -->|"Index Vectors"| Chroma
+
+    Session_Router -->|"Invoke Session Run"| Agent
+    Agent <-->|"Autonomous Tool Execution"| Agent_Tools
+    Tool_Doc <-->|"Query Vectors"| Chroma
+    Agent <-->|"Synthesize Answers"| LLM
+    Agent -->|"NDJSON Stream (Tokens + Reasoning)"| API_Client
 ```
 
 ---
 
-## Core Features
+## ✨ Key Features
 
-### 1. Robust RAG Agent (LangGraph ReAct)
-* **Local Ingestion:** Uploads `pdf`, `docx`, `txt`, `md`, and `csv` files.
-* **Background Embeddings:** Files are automatically parsed and embedded in the background using `sentence-transformers/all-MiniLM-L6-v2` and indexed in session-isolated ChromaDB collections.
-* **Self-Verifying Web Verification:** The agent follows a two-step reasoning process:
-  1. Retrieve relevant local passages from your files.
-  2. Query the web (DuckDuckGo) to verify, update, or expand on local findings.
-* **Reasoning Logs:** Renders real-time reasoning steps showing the agent's logic (e.g. searching local store, calling Wikipedia, or querying the calculator).
+### 🧠 1. LangGraph ReAct Autonomous Reasoning
+* **Dynamic Multi-Tool Execution**: The agent autonomously decides which tools to invoke depending on the nature of the prompt.
+* **Local-First with External Fact-Checking**: Automatically combines facts from uploaded documents with real-time web searches to confirm currency and verify statements.
+* **Transparent Thinking Logs**: Expandable reasoning accordions expose the agent's exact decision tree, tool inputs, and progress while it runs.
+* **Inline Citation Engine**: Synthesizes verified references (`@@CITE_DOC@@`, `@@CITE_WEB@@`, `@@CITE_HACKERNEWS@@`) into clean, interactive citation pills.
 
-### 2. High-Fidelity Streaming UI
-* **ChatGPT Dark Aesthetics:** Built on a clean, bubble-less Zinc dark theme with custom emerald green accents.
-* **Global Drag-and-Drop:** Drag and drop files anywhere over the screen to trigger a blurred upload animation and automatically ingest documents.
-* **Inline Citations:** AI responses render citation link tags containing source types (local file vs. web link), original filenames, and page indicators.
-* **Markdown Support:** Full compilation of headings, lists, bold text, inline code, and fenced code blocks using `marked`.
+### 📚 2. Multi-Format Document Ingestion
+* **Supported Formats**: `.pdf`, `.docx`, `.txt`, `.md`, `.csv` with MIME-type and extension validation.
+* **Session-Isolated Knowledge**: Each research session maintains an isolated ChromaDB collection, preventing knowledge bleed across different projects.
+* **Background Chunking**: Documents are processed asynchronously via `RecursiveCharacterTextSplitter` and embedded using `sentence-transformers/all-MiniLM-L6-v2`.
+* **Automatic Error Recovery**: Corrupted or unprocessable uploads trigger transaction rollbacks and user alerts.
 
-### 3. Authentication & Security
-* **JWT Cookie Authentication:** Utilizes HTTP-only cookies (`access_token` and `refresh_token`) to secure session routes.
-* **Silent Token Renewal:** Frontend features a request interceptor queue. If the access token expires (401 response), the client silently queries `/auth/refresh` to renew cookies and retries the original request seamlessly.
-* **Transactional Integrity:** Validation fails early if uploaded files are corrupt or of unsupported formats. In case of any server failures, partially uploaded files and metadata are rolled back and deleted.
+### 🎨 3. Modern, Accessible Light Theme
+* **Human-Centered Visual Design**: Refined warm-gray background (`#f8f9fb`), pristine white surfaces, and an indigo accent palette (`indigo-600`).
+* **Rich Markdown Rendering**: Full support for tables, blockquotes, syntax-highlighted code blocks, copy-to-clipboard utilities, and numbered lists.
+* **Seamless File Drops**: Drag-and-drop overlay allows instant document upload from any section of the workspace.
+
+### 🔒 4. Enterprise-Grade Authentication & Reliability
+* **Dual-Token JWT Security**: Uses HTTP-only cookie-based access and refresh tokens.
+* **Silent Token Rotation**: Built-in client interceptors automatically renew credentials on token expiry without disrupting streaming conversations or user interactions.
+* **Rate Limiting**: Integrated `slowapi` rate-limiting guards endpoints against abuse.
 
 ---
 
-## Directory Structure
+## 🛠️ Tech Stack
 
+| Domain | Technology | Purpose |
+|---|---|---|
+| **Frontend Framework** | React 19 + Vite | High-performance SPA with fast HMR |
+| **Styling** | Tailwind CSS v4 + Material Symbols | Light-mode design system and typography |
+| **Backend API** | FastAPI (Python 3.12) | Asynchronous REST and streaming server |
+| **Agent Orchestration** | LangGraph + LangChain Core | ReAct state graphs and multi-tool routing |
+| **Vector Storage** | ChromaDB | Persistent local vector embeddings |
+| **Embeddings** | SentenceTransformers (`all-MiniLM-L6-v2`) | Local, private semantic document chunk embeddings |
+| **LLM Inference** | Ollama (`llama3.2`) / Google Gemini | Local offline inference or cloud reasoning |
+| **Database** | SQLite / Supabase PostgreSQL | Session management, chat history, and user credentials |
+| **Tools & Search** | DuckDuckGo, SerpAPI, Wikipedia, Algolia HN | Web ground truth and external knowledge retrieval |
+
+---
+
+## 🚀 Quickstart Guide
+
+Follow these steps to run Lumen AI locally for judging and evaluation.
+
+### 1. Prerequisites
+* **Python**: 3.11 or 3.12
+* **Node.js**: v18+ and `npm`
+* **Ollama**: [Download & install Ollama](https://ollama.com/) (or configure Google Gemini API key)
+
+```bash
+# Pull the default local LLM model
+ollama pull llama3.2
 ```
-Lumen/
-├── backend/
-│   ├── src/
-│   │   ├── config/          # Environment settings
-│   │   ├── controllers/     # Controller business logic
-│   │   ├── database/        # Supabase PostgreSQL database connection
-│   │   ├── models/          # SQLAlchemy models
-│   │   ├── rag/             # LangGraph agent, loaders, splitter, vector store
-│   │   ├── routes/          # API Route configurations
-│   │   ├── schemas/         # Pydantic schemas
-│   │   └── utils/           # Helper files
-│   ├── pyproject.toml
-│   └── main.py              # Backend entry point
-└── frontend/
-    ├── src/
-    │   ├── assets/          # Icons & SVG graphics
-    │   ├── components/      # Sidebar, ChatArea, MessageInput, Auth, Dashboard
-    │   ├── api.js           # API Client wrapper
-    │   └── index.css        # Global CSS variables & Markdown theme
-    ├── package.json
-    └── vite.config.js       # Vite configuration (Tailwind v4)
+
+---
+
+### 2. Backend Setup
+
+```bash
+cd backend
+
+# Option A: Using uv (Recommended)
+uv venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+uv pip install -r requirements.txt
+
+# Option B: Standard Python venv
+python3 -m venv .venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+pip install -r requirements.txt
 ```
 
----
+Create a `.env` file in `backend/`:
+```env
+ACCESS_TOKEN_SECRET="hacktoberfest-lumen-secret-key-32-chars-min"
+REFRESH_TOKEN_SECRET="hacktoberfest-lumen-refresh-secret-key-32"
+is_development=True
+DB_URL="sqlite+aiosqlite:///./db.sqlite3"
+OLLAMA_MODEL="llama3.2"
+OLLAMA_BASE_URL="http://localhost:11434"
+```
 
-## Setup & Running Locally
-
-### Backend Setup
-
-1. **Prerequisites:** Python 3.12, [Ollama](https://ollama.com/) installed and running.
-2. **Download Model:**
-   ```bash
-   ollama pull llama3.2
-   ```
-3. **Environment Setup:** Go to the `backend` directory and create a `.env` file:
-   ```bash
-   cd backend
-   ```
-   Create a `.env` file containing:
-   ```env
-   ACCESS_TOKEN_SECRET="YourSecret"
-   REFRESH_TOKEN_SECRET="YourSecret"
-   is_development=True
-   DB_URL="postgresql+asyncpg://postgres.[project-ref]:[password]@[region-pooler].supabase.com:6543/postgres?sslmode=require"
-   ```
-4. **Install Dependencies & Start Backend:**
-   Using `uv`:
-   ```bash
-   uv run python main.py
-   ```
-   Or standard pip venv:
-   ```bash
-   python -m venv .venv
-   source .venv/bin/activate  # Or .venv\Scripts\activate on Windows
-   pip install -r requirements.txt
-   python main.py
-   ```
-   The backend will start on `http://localhost:8000`.
-
-### Frontend Setup
-
-1. **Prerequisites:** Node.js (v18+) and npm.
-2. **Install & Run:**
-   ```bash
-   cd ../frontend
-   npm install
-   npm run dev
-   ```
-3. Open `http://localhost:5173` in your browser.
+Start the backend API server:
+```bash
+python main.py
+```
+> The API server will start on **`http://localhost:8000`** (Swagger docs available at `http://localhost:8000/docs`).
 
 ---
 
-## API Endpoint Reference
+### 3. Frontend Setup
 
-| Method | Route | Description | Auth Required |
-|---|---|---|---|
-| `POST` | `/api/v1/auth/register` | Register a new user | No |
-| `POST` | `/api/v1/auth/login` | Log in and receive HTTP-only cookies | No |
-| `POST` | `/api/v1/auth/refresh` | Renew expired access tokens silently | No |
-| `POST` | `/api/v1/auth/logout` | Revoke active cookies and logout | Yes |
-| `GET` | `/api/v1/auth/me` | Fetch active user credentials | Yes |
-| `POST` | `/api/v1/sessions/` | Create a new chat session | Yes |
-| `GET` | `/api/v1/sessions/` | List all sessions for logged-in user | Yes |
-| `DELETE` | `/api/v1/sessions/{id}` | Delete a session and its vector store | Yes |
-| `POST` | `/api/v1/sessions/{id}/documents` | Upload files and queue embeddings | Yes |
-| `GET` | `/api/v1/sessions/{id}/documents` | Poll status of uploaded files | Yes |
-| `POST` | `/api/v1/sessions/{id}/agent/stream` | Stream agent responses & tool logs (NDJSON) | Yes |
-| `GET` | `/api/v1/sessions/{id}/messages` | Fetch paginated chat messages history | Yes |
+In a new terminal window:
+```bash
+cd frontend
+
+# Install dependencies
+npm install
+
+# Start Vite development server
+npm run dev
+```
+> Open your browser and navigate to **`http://localhost:5173`**.
+
+---
+
+## 📡 API Endpoints
+
+| Method | Endpoint | Description | Auth Required |
+|---|---|---|:---:|
+| `POST` | `/api/v1/auth/register` | Register a new user account | ❌ |
+| `POST` | `/api/v1/auth/login` | Log in and receive secure HttpOnly cookies | ❌ |
+| `POST` | `/api/v1/auth/refresh` | Silently renew expired access tokens | ❌ |
+| `POST` | `/api/v1/auth/logout` | Revoke tokens and clear cookies | ✅ |
+| `GET` | `/api/v1/auth/me` | Get profile for currently authenticated user | ✅ |
+| `POST` | `/api/v1/sessions/` | Create a new research session | ✅ |
+| `GET` | `/api/v1/sessions/` | Retrieve all user sessions | ✅ |
+| `DELETE` | `/api/v1/sessions/{id}` | Cascade delete session, documents, and vector collections | ✅ |
+| `POST` | `/api/v1/sessions/{id}/documents` | Upload files and trigger async background embedding | ✅ |
+| `GET` | `/api/v1/sessions/{id}/documents` | Poll status of uploaded files (`pending`, `ready`) | ✅ |
+| `POST` | `/api/v1/sessions/{id}/agent/stream` | Stream real-time agent tokens and reasoning steps (NDJSON) | ✅ |
+| `GET` | `/api/v1/sessions/{id}/messages` | Get persistent message history and citations | ✅ |
+
+---
+
+## 🤝 Hacktoberfest & Open Source Contributions
+
+Lumen AI is committed to open-source excellence. Built during **Hacktoberfest 2026**:
+* We adhere to clean commit conventions (`feat:`, `style:`, `fix:`, `docs:`).
+* All agent tools are modular and easily extendable under [`backend/src/rag/agent_tools.py`](backend/src/rag/agent_tools.py).
+* Feel free to submit issues, add new tools (e.g. ArXiv search, code execution), or suggest UI enhancements.
+
+---
+
+## 👥 Authors & Acknowledgments
+
+* **Lead Developer**: Satyam Prakash ([@satyamprakash996](mailto:satyamprakash996@gmail.com))
+* **Event**: [Hacktoberfest Hack Day Noida (Delhi NCR) x NIAT-NIU](https://www.mlh.com/events/hacktoberfest-hack-day-noida-delhi-ncr-x-niat-niu)
+* Special thanks to the **Major League Hacking (MLH)** team and **NIAT-NIU** mentors for organizing this hackathon.
